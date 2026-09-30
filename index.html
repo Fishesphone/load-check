@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>How Hard Are You Actually Training? | TSCM</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;900&family=Barlow:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --teal:      #0D9488;
+  --teal-lt:   #CCFBF1;
+  --teal-dk:   #0F766E;
+  --amber:     #D97706;
+  --amber-lt:  #FEF3C7;
+  --red:       #DC2626;
+  --red-lt:    #FEE2E2;
+  --green:     #16A34A;
+  --green-lt:  #DCFCE7;
+  --purple:    #7C3AED;
+  --purple-lt: #EDE9FE;
+  --dark:      #0F1923;
+  --mid:       #374151;
+  --slate:     #64748B;
+  --border:    #E2E8F0;
+  --surface:   #F8FAFC;
+  --white:     #FFFFFF;
+  --font-d: 'Barlow Condensed', sans-serif;
+  --font-b: 'Barlow', sans-serif;
+  --radius: 14px;
+  --radius-sm: 9px;
+}
+
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: var(--font-b);
+  background: var(--dark);
+  color: var(--white);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── SCREENS ───────────────────────────────────────────── */
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: flex; flex-direction: column; }
+
+/* ── PROGRESS BAR ──────────────────────────────────────── */
+.progress-bar {
+  height: 3px;
+  background: rgba(255,255,255,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--teal);
+  transition: width 0.4s ease;
+}
+
+/* ── SHARED LAYOUT ─────────────────────────────────────── */
+.screen-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 520px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 28px 20px 40px;
+}
+
+.step-tag {
+  font-family: var(--font-d);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 10px;
+}
+
+.screen-title {
+  font-family: var(--font-d);
+  font-weight: 900;
+  font-size: clamp(36px, 9vw, 54px);
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 14px;
+}
+.screen-title span { color: var(--teal); }
+
+.screen-desc {
+  font-size: 15px;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.65;
+  margin-bottom: 28px;
+}
+.screen-desc strong { color: var(--white); }
+
+/* ── FORM ELEMENTS ─────────────────────────────────────── */
+.field {
+  margin-bottom: 16px;
+}
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 7px;
+}
+.field input,
+.field select {
+  width: 100%;
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-sm);
+  color: var(--white);
+  font-family: var(--font-b);
+  font-size: 15px;
+  padding: 13px 15px;
+  outline: none;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+.field input:focus,
+.field select:focus { border-color: var(--teal); }
+.field select option { background: var(--dark); color: var(--white); }
+.field input::placeholder { color: rgba(255,255,255,0.25); }
+
+/* ── CHIP SELECTS ──────────────────────────────────────── */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.chip {
+  padding: 9px 16px;
+  border-radius: 40px;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.6);
+  font-family: var(--font-b);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+.chip:hover { border-color: var(--teal); color: var(--white); }
+.chip.selected { background: var(--teal); border-color: var(--teal); color: var(--white); font-weight: 600; }
+
+/* ── BUTTONS ───────────────────────────────────────────── */
+.btn {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-d);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+.btn-primary { background: var(--teal); color: var(--white); }
+.btn-primary:hover { background: var(--teal-dk); }
+.btn-outline { background: transparent; border: 1.5px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); margin-top: 10px; }
+.btn-outline:hover { border-color: rgba(255,255,255,0.5); color: var(--white); }
+.btn-sm {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 10px 18px; border-radius: 40px;
+  background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.7); font-family: var(--font-b); font-size: 13px;
+  font-weight: 500; cursor: pointer; transition: all 0.15s;
+}
+.btn-sm:hover { background: rgba(255,255,255,0.14); color: var(--white); }
+.btn-sm.teal { background: rgba(13,148,136,0.2); border-color: var(--teal); color: var(--teal); }
+
+.btn-back {
+  background: none; border: none; color: rgba(255,255,255,0.35);
+  font-family: var(--font-b); font-size: 13px; cursor: pointer;
+  padding: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 5px;
+}
+.btn-back:hover { color: rgba(255,255,255,0.7); }
+
+/* ── SESSION CARD ──────────────────────────────────────── */
+.session-card {
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 10px;
+}
+.session-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+.session-card-name {
+  font-family: var(--font-d);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--white);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.session-card-load {
+  font-family: var(--font-d);
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--teal);
+}
+.session-card-meta {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+}
+.session-del {
+  background: none; border: none; color: rgba(255,255,255,0.2);
+  font-size: 18px; cursor: pointer; padding: 0 0 0 10px; line-height: 1;
+}
+.session-del:hover { color: var(--red); }
+
+/* ADD SESSION FORM */
+.add-session-form {
+  background: rgba(13,148,136,0.08);
+  border: 1.5px solid rgba(13,148,136,0.25);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 16px;
+}
+.add-session-form .field { margin-bottom: 12px; }
+.add-session-form .field:last-child { margin-bottom: 0; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ── WELLNESS PICKER ───────────────────────────────────── */
+.wellness-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.wellness-grid {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.w-btn {
+  flex: 1;
+  min-width: 52px;
+  max-width: 68px;
+  height: 64px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.6);
+  font-family: var(--font-b);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px;
+}
+.w-btn:hover { border-color: var(--teal); background: rgba(13,148,136,0.1); }
+.w-btn .we { font-size: 22px; line-height: 1; }
+.w-btn .wn { font-size: 11px; font-weight: 700; font-family: var(--font-d); }
+.w-btn.sel-low  { background: rgba(220,38,38,0.2);  border-color: var(--red);   color: #FCA5A5; }
+.w-btn.sel-mid  { background: rgba(217,119,6,0.2);  border-color: var(--amber); color: #FCD34D; }
+.w-btn.sel-high { background: rgba(13,148,136,0.2); border-color: var(--teal);  color: #5EEAD4; }
+.wellness-label {
+  font-size: 14px;
+  color: rgba(255,255,255,0.6);
+  font-style: italic;
+  min-height: 22px;
+  margin-top: 8px;
+  text-align: center;
+}
+
+/* ── REPORT SCREEN ─────────────────────────────────────── */
+#screen-report {
+  background: var(--surface);
+  color: var(--dark);
+}
+#screen-report .screen-inner { padding-top: 0; }
+
+.report-hero {
+  background: var(--dark);
+  padding: 32px 20px 28px;
+  text-align: left;
+}
+.report-hero-inner {
+  max-width: 520px;
+  margin: 0 auto;
+}
+.report-name {
+  font-family: var(--font-d);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 6px;
+}
+.report-headline {
+  font-family: var(--font-d);
+  font-weight: 900;
+  font-size: clamp(38px, 10vw, 58px);
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 14px;
+}
+.report-headline span { color: var(--teal); }
+
+.report-body { padding: 24px 20px 48px; max-width: 520px; margin: 0 auto; width: 100%; }
+
+/* Load dial */
+.load-dial-wrap {
+  background: var(--dark);
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.load-dial-value {
+  font-family: var(--font-d);
+  font-weight: 900;
+  font-size: 72px;
+  line-height: 1;
+  color: var(--white);
+}
+.load-dial-unit {
+  font-family: var(--font-d);
+  font-size: 18px;
+  color: var(--teal);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 2px;
+  display: block;
+}
+.load-dial-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  margin-top: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.load-bar-wrap {
+  margin: 16px 0 8px;
+  position: relative;
+  height: 12px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.08);
+  overflow: visible;
+}
+.load-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 1s ease;
+  position: relative;
+}
+.load-bar-marker {
+  position: absolute;
+  top: -18px;
+  transform: translateX(-50%);
+  font-size: 9px;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.load-bar-marker::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 8px;
+  background: rgba(255,255,255,0.2);
+}
+
+/* Zone badge */
+.zone-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 40px;
+  font-family: var(--font-d);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 12px;
+}
+
+/* Report section */
+.report-section {
+  margin-bottom: 24px;
+}
+.report-section-title {
+  font-family: var(--font-d);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--slate);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Stat grid */
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.stat-tile {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 14px 12px;
+}
+.stat-tile .sv {
+  font-family: var(--font-d);
+  font-weight: 900;
+  font-size: 32px;
+  line-height: 1;
+  display: block;
+}
+.stat-tile .sl {
+  font-size: 11px;
+  color: var(--slate);
+  display: block;
+  margin-top: 3px;
+  line-height: 1.3;
+}
+.stat-tile.teal .sv { color: var(--teal); }
+.stat-tile.amber .sv { color: var(--amber); }
+.stat-tile.red .sv { color: var(--red); }
+.stat-tile.green .sv { color: var(--green); }
+.stat-tile.purple .sv { color: var(--purple); }
+
+/* Benchmark table */
+.bench-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.bench-table th {
+  background: var(--dark);
+  color: rgba(255,255,255,0.6);
+  font-family: var(--font-d);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+}
+.bench-table td {
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  color: var(--mid);
+  line-height: 1.4;
+}
+.bench-table tr:last-child td { border-bottom: none; }
+.bench-table tr.highlight td { background: rgba(13,148,136,0.06); font-weight: 600; color: var(--dark); }
+.bench-table .you-badge {
+  display: inline-block;
+  background: var(--teal);
+  color: var(--white);
+  font-family: var(--font-d);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  margin-left: 6px;
+}
+
+/* Callout */
+.report-callout {
+  border-left: 4px solid var(--teal);
+  background: white;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: var(--mid);
+  line-height: 1.65;
+}
+.report-callout strong { color: var(--dark); }
+.report-callout.amber { border-color: var(--amber); }
+.report-callout.red { border-color: var(--red); }
+.report-callout.green { border-color: var(--green); }
+
+/* Source list */
+.source-list {
+  font-size: 11px;
+  color: var(--slate);
+  line-height: 1.7;
+  margin-top: 8px;
+}
+
+/* CTA section */
+.report-cta {
+  background: var(--dark);
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  text-align: center;
+  margin-top: 24px;
+}
+.report-cta h3 {
+  font-family: var(--font-d);
+  font-weight: 900;
+  font-size: 28px;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 8px;
+  line-height: 1;
+}
+.report-cta h3 span { color: var(--teal); }
+.report-cta p { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.6; margin-bottom: 18px; }
+.report-cta .btn-primary { max-width: 300px; margin: 0 auto; }
+
+/* ── HERO INTRO ────────────────────────────────────────── */
+.hero-screen {
+  background: var(--dark);
+  position: relative;
+  overflow: hidden;
+}
+.hero-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 80% 20%, rgba(13,148,136,0.18) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 48px 24px 40px;
+  position: relative;
+}
+.hero-logo {
+  font-family: var(--font-d);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 32px;
+}
+.hero-h1 {
+  font-family: var(--font-d);
+  font-weight: 900;
+  font-size: clamp(44px, 12vw, 72px);
+  line-height: 0.92;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 20px;
+}
+.hero-h1 span { color: var(--teal); }
+.hero-desc {
+  font-size: 16px;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.7;
+  margin-bottom: 36px;
+  max-width: 420px;
+}
+.hero-desc strong { color: var(--white); }
+.hero-stats {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 36px;
+  flex-wrap: wrap;
+}
+.hero-stat {
+  display: flex;
+  flex-direction: column;
+}
+.hero-stat .n {
+  font-family: var(--font-d);
+  font-weight: 900;
+  font-size: 28px;
+  color: var(--teal);
+  line-height: 1;
+}
+.hero-stat .l {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  margin-top: 2px;
+}
+.hero-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+.hero-badge {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 4px 12px;
+}
+
+/* ── ERROR MSG ─────────────────────────────────────────── */
+.err-msg {
+  font-size: 13px;
+  color: #FCA5A5;
+  margin-top: 6px;
+  display: none;
+}
+
+/* ── LOADING ───────────────────────────────────────────── */
+.loading-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--dark);
+  z-index: 999;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+.loading-overlay.active { display: flex; }
+.loading-spinner {
+  width: 44px; height: 44px;
+  border: 3px solid rgba(13,148,136,0.2);
+  border-top-color: var(--teal);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text {
+  font-family: var(--font-d);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+}
+
+/* scroll utility */
+.flex-spacer { flex: 1; }
+.flag-btn {
+  display: flex; align-items: center; gap: 7px;
+  padding: 9px 14px;
+  border-radius: 40px;
+  border: 1.5px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.55);
+  font-family: var(--font-b);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+.flag-btn:hover { border-color: var(--teal); color: var(--white); }
+.flag-btn.selected { background: rgba(13,148,136,0.18); border-color: var(--teal); color: #5EEAD4; }
+.flag-btn .fi { font-size: 16px; }
+.divider { height: 1px; background: rgba(255,255,255,0.08); margin: 20px 0; }
+.why-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.why-card:hover { border-color: rgba(13,148,136,0.3); }
+.why-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 16px;
+  cursor: pointer;
+  gap: 12px;
+}
+.why-card-icon { font-size: 18px; flex-shrink: 0; }
+.why-card-title {
+  font-family: var(--font-d);
+  font-weight: 700;
+  font-size: 15px;
+  color: rgba(255,255,255,0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  flex: 1;
+}
+.why-card-chevron {
+  font-size: 12px;
+  color: rgba(255,255,255,0.3);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.why-card.open .why-card-chevron { transform: rotate(180deg); }
+.why-card-body {
+  display: none;
+  padding: 0 16px 16px;
+  font-size: 13.5px;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.7;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding-top: 12px;
+}
+.why-card.open .why-card-body { display: block; }
+.why-card-body strong { color: rgba(255,255,255,0.8); }
+</style>
+</head>
+<body>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loading">
+  <div class="loading-spinner"></div>
+  <div class="loading-text" id="loading-text">Building your report...</div>
+</div>
+
+<!-- ================================================
+     SCREEN 1: HERO
+     ================================================ -->
+<div class="screen hero-screen active" id="screen-hero">
+  <div class="hero-inner">
+    <div class="hero-logo">The Sports Clinic of Melbourne</div>
+    <div class="hero-h1">How hard<br>are you<br><span>actually</span><br>training?</div>
+    <p class="hero-desc">
+      You play for multiple teams. <strong>None of your coaches can see the full picture.</strong> This tool adds it all up and shows you where you sit against the science — so you can train smarter and perform when it actually matters.
+    </p>
+    <div class="hero-stats">
+      <div class="hero-stat"><span class="n">3 min</span><span class="l">to complete</span></div>
+      <div class="hero-stat"><span class="n">12+</span><span class="l">research studies</span></div>
+      <div class="hero-stat"><span class="n">Free</span><span class="l">personalised report</span></div>
+    </div>
+    <div class="hero-badge-row">
+      <span class="hero-badge">Age 14–18</span>
+      <span class="hero-badge">Basketball</span>
+      <span class="hero-badge">Science-backed</span>
+      <span class="hero-badge">Australia</span>
+    </div>
+    <button class="btn btn-primary" onclick="goTo('about')">Get my report &rarr;</button>
+
+    <div style="margin-top:28px;">
+      <div style="font-size:11px;font-family:var(--font-d);font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:12px;">Why does this matter?</div>
+      <div id="why-cards"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================
+     SCREEN 2: ABOUT YOU
+     ================================================ -->
+<div class="screen" id="screen-about">
+  <div class="progress-bar"><div class="progress-fill" style="width:14%"></div></div>
+  <div class="screen-inner">
+    <button class="btn-back" onclick="goTo('hero')">← Back</button>
+    <div class="step-tag">Step 1 of 5</div>
+    <div class="screen-title">Tell us<br>about <span>you</span></div>
+    <p class="screen-desc">We use this to make your benchmark comparison accurate. Your age especially — the science has a specific threshold that's personal to you.</p>
+
+    <div class="field">
+      <label>First name</label>
+      <input type="text" id="f-name" placeholder="e.g. Maddie" autocomplete="off" />
+    </div>
+
+    <div class="field">
+      <label>Email (we send your report here)</label>
+      <input type="email" id="f-email" placeholder="you@example.com" autocomplete="email" />
+    </div>
+
+    <div class="field">
+      <label>Age</label>
+      <select id="f-age">
+        <option value="">Select your age</option>
+        <option>11</option><option>12</option><option>13</option>
+        <option>14</option><option>15</option><option>16</option>
+        <option>17</option><option>18</option><option>19</option>
+        <option>20</option><option>21</option><option>22+</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Gender</label>
+    </div>
+    <div class="chips" id="chips-gender">
+      <div class="chip" data-val="female" onclick="selectChip('gender',this)">Female</div>
+      <div class="chip" data-val="male" onclick="selectChip('gender',this)">Male</div>
+      <div class="chip" data-val="non-binary" onclick="selectChip('gender',this)">Non-binary</div>
+      <div class="chip" data-val="prefer-not" onclick="selectChip('gender',this)">Prefer not to say</div>
+    </div>
+
+    <div class="field">
+      <label>State</label>
+      <select id="f-state">
+        <option value="">Select your state</option>
+        <option>VIC</option><option>NSW</option><option>QLD</option>
+        <option>SA</option><option>WA</option><option>TAS</option>
+        <option>ACT</option><option>NT</option>
+        <option>New Zealand</option><option>Other</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Competition level</label>
+    </div>
+    <div class="chips" id="chips-level">
+      <div class="chip" data-val="local" onclick="selectChip('level',this)">Local / club</div>
+      <div class="chip" data-val="rep" onclick="selectChip('level',this)">Rep / district</div>
+      <div class="chip" data-val="state" onclick="selectChip('level',this)">State program</div>
+      <div class="chip" data-val="national" onclick="selectChip('level',this)">National team</div>
+    </div>
+
+    <div class="flex-spacer"></div>
+    <div id="err-about" class="err-msg">Fill in your name, a valid email, age, and level to continue.</div>
+    <p style="font-size:11px;color:rgba(255,255,255,0.45);line-height:1.6;margin-top:16px;">By continuing you agree to TSCM storing your answers to email you your report and help monitor your training load. If you are under 18, please have a parent or guardian's OK. We never sell or share your data. Contact ryan@sportsclinicmelb.com.au to have it removed.</p>
+    <button class="btn btn-primary" onclick="nextFromAbout()" style="margin-top:20px;">Next →</button>
+  </div>
+</div>
+
+<!-- ================================================
+     SCREEN 3: YOUR TEAMS
+     ================================================ -->
+<div class="screen" id="screen-teams">
+  <div class="progress-bar"><div class="progress-fill" style="width:28%"></div></div>
+  <div class="screen-inner">
+    <button class="btn-back" onclick="goTo('about')">← Back</button>
+    <div class="step-tag">Step 2 of 5</div>
+    <div class="screen-title">Your<br><span>teams</span> and<br>squads</div>
+    <p class="screen-desc">List every team, squad, or program you're part of right now. Rep team, school team, local league, 3x3, training programs — <strong>all of them.</strong> This is where most players realise nobody has ever counted it all up before.</p>
+
+    <!-- Teams list -->
+    <div id="teams-list" style="margin-bottom:12px;"></div>
+
+    <!-- Add team form -->
+    <div class="add-session-form" id="add-team-form">
+      <div class="step-tag" style="margin-bottom:12px;">Add a team or squad</div>
+      <div class="field">
+        <label>Team / squad name</label>
+        <input type="text" id="t-name" placeholder="e.g. Tigers U18 Rep, School 1st team, 3x3 crew..." autocomplete="off" />
+      </div>
+      <div class="field">
+        <label>Type</label>
+        <select id="t-type">
+          <option value="rep">Rep / district team</option>
+          <option value="school">School team</option>
+          <option value="local">Local league / club</option>
+          <option value="national">State / national program</option>
+          <option value="3x3">3x3 squad</option>
+          <option value="skills">Skills / coaching program</option>
+          <option value="gym">Gym / S&amp;C program</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="addTeam()" style="font-size:15px;padding:12px;">+ Add team</button>
+    </div>
+
+    <div class="divider"></div>
+    <p class="screen-desc" style="margin-bottom:12px;">What's your big goal this season?</p>
+    <div class="field">
+      <label>Target event</label>
+      <input type="text" id="f-goal" placeholder="e.g. State trials, National Champs, Club playoffs" />
+    </div>
+    <div class="field">
+      <label>Approximate date</label>
+      <input type="date" id="f-goal-date" />
+    </div>
+
+    <div class="flex-spacer"></div>
+    <div id="err-teams" class="err-msg">Add at least one team to continue.</div>
+    <button class="btn btn-primary" onclick="nextFromTeams()" style="margin-top:20px;">Next →</button>
+  </div>
+</div>
+
+<!-- ================================================
+     SCREEN 4: LOG YOUR SESSIONS
+     ================================================ -->
+<div class="screen" id="screen-sessions">
+  <div class="progress-bar"><div class="progress-fill" style="width:52%"></div></div>
+  <div class="screen-inner">
+    <button class="btn-back" onclick="goTo('teams')">← Back</button>
+    <div class="step-tag">Step 3 of 5</div>
+    <div class="screen-title">Log your<br><span>sessions</span><br>this week</div>
+    <p class="screen-desc">Every session from every team. Training, games, gym, skills — the lot. <strong>This is where your total load gets calculated.</strong></p>
+
+    <!-- Sessions list -->
+    <div id="sessions-list"></div>
+
+    <!-- Add session form -->
+    <div class="add-session-form" id="add-form">
+      <div class="step-tag" style="margin-bottom:12px;">Add a session</div>
+      <div class="field">
+        <label>Which team or context?</label>
+        <select id="s-team">
+          <option value="">Select team...</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Session type</label>
+        <select id="s-type">
+          <option value="training">Team training</option>
+          <option value="game">Game / competition</option>
+          <option value="skills">Skills training</option>
+          <option value="shooting">Shooting session</option>
+          <option value="1on1">1-on-1 coaching</option>
+          <option value="gym_lower">Gym &mdash; lower body</option>
+          <option value="gym_upper">Gym &mdash; upper body</option>
+          <option value="gym_full">Gym &mdash; full body</option>
+          <option value="3x3">3x3 / open runs</option>
+          <option value="recovery">Recovery / other</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Duration (min)</label>
+          <input type="number" id="s-dur" placeholder="e.g. 90" min="5" max="300" />
+        </div>
+        <div class="field">
+          <label>Intensity (RPE)</label>
+          <select id="s-int">
+            <option value="">How hard?</option>
+            <option value="45">45% &mdash; RPE 4-5 &mdash; Easy stretch / recovery</option>
+            <option value="55">55% &mdash; RPE 5-6 &mdash; Warm-up pace, low effort</option>
+            <option value="65">65% &mdash; RPE 6-7 &mdash; Steady, could talk easily</option>
+            <option value="75">75% &mdash; RPE 7-8 &mdash; Working, half-court drill pace</option>
+            <option value="80">80% &mdash; RPE 8 &mdash; Hard, full practice intensity</option>
+            <option value="85">85% &mdash; RPE 8-9 &mdash; Very hard, sprinting drills</option>
+            <option value="90">90% &mdash; RPE 9 &mdash; Near max, defensive pressure</option>
+            <option value="95">95% &mdash; RPE 9-10 &mdash; Game pace, close contest</option>
+            <option value="100">100% &mdash; RPE 10 &mdash; Finals, everything on the line</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="addSession()" style="font-size:15px;padding:12px;">+ Add session</button>
+    </div>
+
+    <!-- Running total -->
+    <div id="running-total" style="display:none; background:rgba(13,148,136,0.1); border:1.5px solid rgba(13,148,136,0.25); border-radius:var(--radius-sm); padding:14px 16px; margin-bottom:16px; text-align:center;">
+      <div style="font-size:11px;color:var(--teal);text-transform:uppercase;letter-spacing:0.08em;font-weight:600;margin-bottom:4px;">Running total so far</div>
+      <div style="font-family:var(--font-d);font-weight:900;font-size:32px;color:var(--white);" id="running-au">0 AU</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:2px;" id="running-sessions">0 sessions</div>
+    </div>
+
+    <div id="err-sessions" class="err-msg">Add at least one session to continue.</div>
+    <button class="btn btn-primary" id="btn-next-sessions" onclick="nextFromSessions()" style="margin-top:8px;">Next →</button>
+  </div>
+</div>
+
+<!-- ================================================
+     SCREEN 5: WELLNESS
+     ================================================ -->
+<div class="screen" id="screen-wellness">
+  <div class="progress-bar"><div class="progress-fill" style="width:76%"></div></div>
+  <div class="screen-inner">
+    <button class="btn-back" onclick="goTo('sessions')">← Back</button>
+    <div class="step-tag">Step 4 of 5</div>
+    <div class="screen-title">How are<br>you<br><span>feeling?</span></div>
+    <p class="screen-desc">Be honest with yourself here. This number is for you, not your coaches. Athletes who are honest about fatigue get the most out of their report.</p>
+
+    <div class="field"><label>Overall this week &mdash; tap how you feel</label></div>
+    <div class="wellness-grid" id="wellness-row"></div>
+    <div class="wellness-label" id="wellness-label">Tap a number</div>
+
+    <div class="divider"></div>
+
+    <div class="field"><label>Any specific flags this week? (tap all that apply)</label></div>
+    <div id="flag-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;"></div>
+
+    <div class="field">
+      <label>Anything else to flag? (optional)</label>
+      <input type="text" id="f-notes" placeholder="e.g. sore knee after Thursday, big exam week..." />
+    </div>
+
+    <div class="flex-spacer"></div>
+    <div id="err-wellness" class="err-msg">Give yourself a wellness score to continue.</div>
+    <button class="btn btn-primary" onclick="buildReport()" style="margin-top:20px;">Generate my report →</button>
+  </div>
+</div>
+
+<!-- ================================================
+     SCREEN 6: REPORT
+     ================================================ -->
+<div class="screen" id="screen-report">
+
+  <div class="report-hero">
+    <div class="report-hero-inner">
+      <div class="report-name" id="r-name-label">Your report</div>
+      <div class="report-headline" id="r-headline">Loading...</div>
+    </div>
+  </div>
+
+  <div class="report-body">
+
+    <!-- Load overview -->
+    <div class="load-dial-wrap">
+      <div class="load-dial-value" id="r-load-value">—</div>
+      <span class="load-dial-unit">AU this week</span>
+      <div class="load-dial-label">Weekly sRPE load (arbitrary units)</div>
+
+      <div class="load-bar-wrap" id="r-bar-wrap" style="margin-top:20px;">
+        <div class="load-bar-fill" id="r-bar-fill"></div>
+      </div>
+
+      <div id="r-zone-badge" class="zone-badge" style="display:none;"></div>
+    </div>
+
+    <!-- Quick stats -->
+    <div class="report-section">
+      <div class="report-section-title">Your week at a glance</div>
+      <div class="stat-grid" id="r-stats"></div>
+    </div>
+
+    <!-- Personal thresholds -->
+    <div class="report-section" id="r-threshold-section">
+      <div class="report-section-title">Your personal load thresholds</div>
+      <div id="r-threshold-content"></div>
+    </div>
+
+    <!-- Benchmark comparison -->
+    <div class="report-section">
+      <div class="report-section-title">How you compare — the research</div>
+      <div id="r-bench-callout" style="margin-bottom:12px;"></div>
+      <div style="border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--border);">
+        <table class="bench-table" id="r-bench-table"></table>
+      </div>
+      <div class="source-list" id="r-sources"></div>
+    </div>
+
+    <!-- Multi-team gap -->
+    <div class="report-section" id="r-multiteam-section">
+      <div class="report-section-title">The multi-team blind spot</div>
+      <div id="r-multiteam-content"></div>
+    </div>
+
+    <!-- What to do -->
+    <div class="report-section">
+      <div class="report-section-title">What this means for you</div>
+      <div id="r-advice"></div>
+    </div>
+
+    <!-- Goal section -->
+    <div class="report-section" id="r-goal-section" style="display:none;">
+      <div class="report-section-title">Your goal</div>
+      <div id="r-goal-content"></div>
+    </div>
+
+    <!-- CTA -->
+    <div class="report-cta">
+      <h3>Want to track this<br><span>every week?</span></h3>
+      <p>The TSCM weekly log takes 3 minutes. Your physio sees your load every week and can help you plan around your big events before problems happen.</p>
+      <button class="btn btn-primary" onclick="alert('Contact TSCM or Plus One Basketball to get set up with weekly monitoring.')">Get set up with weekly tracking →</button>
+    </div>
+
+    <!-- Save / share -->
+    <div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn-sm teal" onclick="shareReport()">📤 Share this report</button>
+      <button class="btn-sm" onclick="startOver()">↩ Start again</button>
+    </div>
+
+    <!-- Methodology -->
+    <div style="margin-top:32px; padding-top:20px; border-top:1px solid var(--border);">
+      <div style="font-size:10px;font-family:var(--font-d);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--slate);margin-bottom:8px;">Methodology</div>
+      <p style="font-size:11px;color:var(--slate);line-height:1.7;">Load calculated using sRPE (session RPE): duration × RPE. RPE derived from intensity percentage (intensity% ÷ 10). All benchmarks are from single-team monitoring studies — your total cross-team load has no direct published comparator, which is the point. Age-based threshold from Jayanthi et al. (2013) and NATA position statement. Published benchmarks: Cruz et al. 2018 (PeerJ); Palmer et al. 2023 (Sports); Lever et al. 2024 (JSCR); Lever et al. 2024 (J Sports Sci); Athletics Australia guidelines. This tool is for educational purposes and does not replace clinical assessment.</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════
+const SUPABASE_URL  = 'https://skhizoyfrfhrgeunsbbn.supabase.co';
+const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNraGl6b3lmcmZocmdldW5zYmJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1Njc4MjEsImV4cCI6MjA5NjE0MzgyMX0.tAegXd7m7tIPjL0BgDNplWcP1MPJmTIbfKgyWdgp2Sk';
+
+let state = {
+  name: '', email: '', age: null, gender: '', state: '', level: '',
+  teamsList: [], goal: '', goalDate: '',
+  sessions: [], wellness: null, flags: [], notes: ''
+};
+
+let chips = { gender: null, level: null, teams: null };
+
+// ════════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════════
+const SCREENS = ['hero','about','teams','sessions','wellness','report'];
+
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ════════════════════════════════════════════════════════
+// CHIPS
+// ════════════════════════════════════════════════════════
+function selectChip(group, el) {
+  document.querySelectorAll('#chips-' + group + ' .chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  chips[group] = el.dataset.val;
+}
+
+// ════════════════════════════════════════════════════════
+// STEP VALIDATION
+// ════════════════════════════════════════════════════════
+function nextFromAbout() {
+  const name  = document.getElementById('f-name').value.trim();
+  const age   = document.getElementById('f-age').value;
+  const level = chips.level;
+  const err   = document.getElementById('err-about');
+  const email = document.getElementById('f-email').value.trim().toLowerCase();
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if (!name || !age || !level || !emailOk) { err.style.display = 'block'; return; }
+  err.style.display = 'none';
+  state.name  = name;
+  state.email = email;
+  state.age   = age === '22+' ? 22 : parseInt(age);
+  state.gender= chips.gender || 'prefer-not';
+  state.state = document.getElementById('f-state').value;
+  state.level = level;
+  goTo('teams');
+}
+
+function addTeam() {
+  const name = document.getElementById('t-name').value.trim();
+  const type = document.getElementById('t-type').value;
+  if (!name) { alert('Enter a team name.'); return; }
+  if (!state.teamsList) state.teamsList = [];
+  state.teamsList.push({ name, type });
+  document.getElementById('t-name').value = '';
+  renderTeams();
+}
+
+function deleteTeam(idx) {
+  state.teamsList.splice(idx, 1);
+  renderTeams();
+}
+
+const TEAM_TYPE_LABELS = {
+  rep:'Rep / district', school:'School team', local:'Local league',
+  national:'State / national', '3x3':'3x3', skills:'Skills program',
+  gym:'Gym / S&C', other:'Other'
+};
+
+function renderTeams() {
+  const list = document.getElementById('teams-list');
+  if (!state.teamsList || state.teamsList.length === 0) {
+    list.innerHTML = '';
+    return;
+  }
+  list.innerHTML = state.teamsList.map((t,i) => `
+    <div class="session-card" style="margin-bottom:8px;">
+      <div class="session-card-header">
+        <div>
+          <div class="session-card-name">${t.name}</div>
+          <div class="session-card-meta">${TEAM_TYPE_LABELS[t.type] || t.type}</div>
+        </div>
+        <button class="session-del" onclick="deleteTeam(${i})">×</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function nextFromTeams() {
+  const err = document.getElementById('err-teams');
+  if (!state.teamsList || state.teamsList.length === 0) {
+    err.style.display = 'block'; return;
+  }
+  err.style.display = 'none';
+  state.goal     = document.getElementById('f-goal').value.trim();
+  state.goalDate = document.getElementById('f-goal-date').value;
+  // Populate the session team dropdown
+  populateTeamDropdown();
+  goTo('sessions');
+}
+
+function populateTeamDropdown() {
+  const sel = document.getElementById('s-team');
+  if (!sel) return;
+  const teams = state.teamsList || [];
+  sel.innerHTML = '<option value="">Select team...</option>' +
+    teams.map(t => `<option value="${t.name}">${t.name}</option>`).join('') +
+    '<option value="Individual / other">Individual / other</option>';
+}
+
+function nextFromSessions() {
+  const err = document.getElementById('err-sessions');
+  if (state.sessions.length === 0) { err.style.display = 'block'; return; }
+  err.style.display = 'none';
+  goTo('wellness');
+  initWellness();
+}
+
+// ════════════════════════════════════════════════════════
+// SESSIONS
+// ════════════════════════════════════════════════════════
+function addSession() {
+  const team = document.getElementById('s-team').value.trim();
+  const type = document.getElementById('s-type').value;
+  const dur  = parseInt(document.getElementById('s-dur').value);
+  const int_ = parseInt(document.getElementById('s-int').value);
+
+  if (!team || !dur || !int_ || dur < 10 || int_ < 10 || int_ > 100) {
+    alert('Fill in all session details. Duration in minutes, intensity 10-100%.');
+    return;
+  }
+
+  const rpe  = int_ / 10;
+  const load = Math.round(dur * rpe);
+
+  state.sessions.push({ team, type, duration: dur, intensity: int_, load });
+
+  // Clear form
+  document.getElementById('s-team').value = '';
+  document.getElementById('s-dur').value  = '';
+  document.getElementById('s-int').value  = '';
+
+  renderSessions();
+}
+
+function deleteSession(idx) {
+  state.sessions.splice(idx, 1);
+  renderSessions();
+}
+
+function typeLabel(t) {
+  return { training:'Team training', game:'Game', skills:'Skills / 1:1', gym:'Gym / S&C', '3x3':'3x3 / Open runs', other:'Other' }[t] || t;
+}
+
+function renderSessions() {
+  const list  = document.getElementById('sessions-list');
+  const total = document.getElementById('running-total');
+  const btn   = document.getElementById('btn-next-sessions');
+
+  if (state.sessions.length === 0) {
+    list.innerHTML = '';
+    total.style.display = 'none';
+    btn.style.display = 'none';
+    return;
+  }
+
+  const totalAU = state.sessions.reduce((s,x) => s + x.load, 0);
+  const totalSessions = state.sessions.length;
+
+  list.innerHTML = state.sessions.map((s,i) => `
+    <div class="session-card">
+      <div class="session-card-header">
+        <div>
+          <div class="session-card-name">${s.team}</div>
+          <div class="session-card-meta">${typeLabel(s.type)} &nbsp;·&nbsp; ${s.duration} min &nbsp;·&nbsp; ${s.intensity}% intensity</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="session-card-load">${s.load.toLocaleString()} AU</div>
+          <button class="session-del" onclick="deleteSession(${i})">×</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  total.style.display = 'block';
+  document.getElementById('running-au').textContent = totalAU.toLocaleString() + ' AU';
+  document.getElementById('running-sessions').textContent = totalSessions + ' session' + (totalSessions !== 1 ? 's' : '');
+  btn.style.display = 'block';
+}
+
+// ════════════════════════════════════════════════════════
+// WELLNESS
+// ════════════════════════════════════════════════════════
+const WELLNESS_EMOJIS = ['😰','😓','😐','🙂','💪'];
+const WELLNESS_LABELS = [
+  'Completely exhausted — struggling',
+  'Very tired — low energy',
+  'Pretty tired — getting through it',
+  'A bit tired but managing',
+  'Slightly fatigued, mostly OK',
+  'Feeling decent overall',
+  'Feeling good — recovered well',
+  'Feeling really good — strong',
+  'Excellent — full energy',
+  "Peak — best I've felt all week"
+];
+
+function initWellness() {
+  const row = document.getElementById('wellness-row');
+  row.innerHTML = Array.from({length:10}, (_,i) => {
+    const n = i + 1;
+    const emoji = WELLNESS_EMOJIS[Math.floor(i/2)];
+    return `<button class="w-btn" onclick="selectWellness(${n},this)" id="wb-${n}">
+      <span class="we">${emoji}</span>
+      <span class="wn">${n}</span>
+    </button>`;
+  }).join('');
+  initFlags();
+  if (state.wellness) {
+    const el = document.getElementById('wb-' + state.wellness);
+    if (el) selectWellness(state.wellness, el);
+  }
+}
+
+function selectWellness(n, el) {
+  state.wellness = n;
+  document.querySelectorAll('.w-btn').forEach(b => b.className = 'w-btn');
+  const cls = n <= 3 ? 'sel-low' : n <= 6 ? 'sel-mid' : 'sel-high';
+  (el || document.getElementById('wb-'+n)).className = 'w-btn ' + cls;
+  document.getElementById('wellness-label').textContent = WELLNESS_LABELS[n-1] || '';
+  document.getElementById('err-wellness').style.display = 'none';
+}
+
+const FLAGS = [
+  { id:'sore',  icon:'🦵', label:'Muscle soreness' },
+  { id:'tired', icon:'😴', label:'Extra tired' },
+  { id:'sleep', icon:'💤', label:'Poor sleep' },
+  { id:'mood',  icon:'😶', label:'Low mood' },
+  { id:'pain',  icon:'⚡', label:'Pain / injury concern' },
+  { id:'sharp', icon:'🔥', label:'Feeling sharp' },
+];
+
+function initFlags() {
+  const grid = document.getElementById('flag-grid');
+  if (!grid) return;
+  grid.innerHTML = FLAGS.map(f => `
+    <button class="flag-btn${state.flags && state.flags.includes(f.id) ? ' selected' : ''}"
+      onclick="toggleFlag('${f.id}',this)">
+      <span class="fi">${f.icon}</span>${f.label}
+    </button>
+  `).join('');
+}
+
+function toggleFlag(id, el) {
+  if (!state.flags) state.flags = [];
+  if (state.flags.includes(id)) {
+    state.flags = state.flags.filter(f => f !== id);
+    el.classList.remove('selected');
+  } else {
+    state.flags.push(id);
+    el.classList.add('selected');
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// BUILD REPORT
+// ════════════════════════════════════════════════════════
+// Stable athlete ID: ?a=code in the link wins, else email, so weekly check-ins link to one person
+function getAthleteId() {
+  try {
+    const q = new URLSearchParams(window.location.search).get('a');
+    if (q) { localStorage.setItem('tscm_athlete_id', q); return q; }
+  } catch(e) {}
+  return (state.email || state.name || 'unknown').toLowerCase().trim();
+}
+function weekStartISO() {
+  const d = new Date(); const day = (d.getDay() + 6) % 7; // Monday start
+  d.setDate(d.getDate() - day);
+  return d.toISOString().slice(0,10);
+}
+
+async function buildReport() {
+  if (!state.wellness) {
+    document.getElementById('err-wellness').style.display = 'block';
+    return;
+  }
+  state.notes = document.getElementById('f-notes').value.trim();
+
+  // Show loading
+  document.getElementById('loading').classList.add('active');
+  const loadingTexts = [
+    'Calculating your load...',
+    'Comparing against the research...',
+    'Building your personalised report...',
+    'Almost done...'
+  ];
+  let li = 0;
+  const lt = setInterval(() => {
+    li = (li + 1) % loadingTexts.length;
+    document.getElementById('loading-text').textContent = loadingTexts[li];
+  }, 900);
+
+  // Calculate
+  const totalAU      = state.sessions.reduce((s,x) => s + x.load, 0);
+  const totalMin     = state.sessions.reduce((s,x) => s + x.duration, 0);
+  const totalHrs     = totalMin / 60;
+  const avgInt       = state.sessions.length
+    ? Math.round(state.sessions.reduce((s,x) => s + x.intensity, 0) / state.sessions.length)
+    : 0;
+  const ageThreshold = state.age === '22+' ? 22 : state.age; // hours = age in years (Jayanthi rule)
+  const absThreshold = 16; // hours
+  const hrsVsAge     = totalHrs > ageThreshold;
+  const hrsVsAbs     = totalHrs > absThreshold;
+  const teamsInt     = state.teamsList ? state.teamsList.length : 1;
+
+  // Weeks to goal
+  let weeksToGoal = null;
+  if (state.goalDate) {
+    const diff = new Date(state.goalDate) - new Date();
+    weeksToGoal = Math.max(0, Math.ceil(diff / (7 * 24 * 60 * 60 * 1000)));
+  }
+
+  // Save to Supabase + localStorage
+  const token = Math.random().toString(36).substr(2, 10).toUpperCase();
+  const payload = {
+    name: state.name, age: state.age, gender: state.gender,
+    state: state.state, level: state.level,
+    teams_count: teamsInt,
+    teams_list: state.teamsList || [],
+    weekly_hours: parseFloat(totalHrs.toFixed(1)),
+    weekly_load_au: totalAU,
+    sessions: state.sessions,
+    wellness: state.wellness,
+    flags: state.flags || [],
+    goal_event: state.goal || null,
+    goal_date: state.goalDate || null,
+    weeks_to_goal: weeksToGoal,
+    report_token: token,
+    email: state.email,
+    athlete_id: getAthleteId(),
+    week_start: weekStartISO(),
+    notes: state.notes || null,
+    source: new URLSearchParams(window.location.search).get('src') || 'direct'
+  };
+
+  // Try Supabase save (non-blocking)
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/benchmark_submissions`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(payload)
+    });
+  } catch(e) { /* silent fail — localStorage fallback */ }
+
+  // localStorage backup
+  try {
+    const saved = JSON.parse(localStorage.getItem('tscm_benchmarks') || '[]');
+    saved.push({ ...payload, saved_at: new Date().toISOString() });
+    localStorage.setItem('tscm_benchmarks', JSON.stringify(saved));
+  } catch(e) {}
+
+  clearInterval(lt);
+  document.getElementById('loading').classList.remove('active');
+
+  // Render report
+  renderReport(totalAU, totalMin, totalHrs, avgInt, hrsVsAge, hrsVsAbs, weeksToGoal, token);
+  goTo('report');
+}
+
+// ════════════════════════════════════════════════════════
+// RENDER REPORT
+// ════════════════════════════════════════════════════════
+function renderReport(totalAU, totalMin, totalHrs, avgInt, hrsVsAge, hrsVsAbs, weeksToGoal, token) {
+  const name = state.name;
+  const age  = state.age;
+  const teamsInt = state.teamsList ? state.teamsList.length : 1;
+
+  // Zone classification
+  // Based on benchmarks: <3,000 below lit range, 3,000-4,500 within range,
+  // 4,500-6,000 elevated, >6,000 high, >8,000 very high
+  let zone, zoneColor, zoneIcon;
+  if      (totalAU < 2000)  { zone = 'Below range';   zoneColor = '#64748B'; zoneIcon = '📉'; }
+  else if (totalAU < 3500)  { zone = 'Within range';  zoneColor = '#16A34A'; zoneIcon = '✓'; }
+  else if (totalAU < 5000)  { zone = 'Elevated';      zoneColor = '#D97706'; zoneIcon = '⚡'; }
+  else if (totalAU < 7000)  { zone = 'High load';     zoneColor = '#DC2626'; zoneIcon = '🔴'; }
+  else                       { zone = 'Very high';     zoneColor = '#7C3AED'; zoneIcon = '🚨'; }
+
+  // Headline
+  document.getElementById('r-name-label').textContent = `${name}'s report`;
+  const headlines = {
+    'Below range': `${name}, you have room\nto build.`,
+    'Within range': `${name}, you're\nin the zone.`,
+    'Elevated': `${name}, your load\nis elevated.`,
+    'High load': `${name}, your load\nis high.`,
+    'Very high': `${name}, this week\nwas huge.`
+  };
+  document.getElementById('r-headline').innerHTML =
+    (headlines[zone] || `${name}, here's\nyour load.`).replace('\n','<br>').replace('zone.', '<span>zone.</span>').replace('elevated.','<span>elevated.</span>').replace('high.','<span>high.</span>').replace('huge.','<span>huge.</span>').replace('build.','<span>build.</span>');
+
+  // Load dial
+  document.getElementById('r-load-value').textContent = totalAU.toLocaleString();
+
+  // Bar — max at 10,000
+  const barPct   = Math.min(100, (totalAU / 10000) * 100);
+  const barColor = totalAU < 3500 ? '#16A34A' : totalAU < 5000 ? '#D97706' : '#DC2626';
+  const fill = document.getElementById('r-bar-fill');
+  fill.style.width = barPct + '%';
+  fill.style.background = barColor;
+
+  // Zone badge
+  const badge = document.getElementById('r-zone-badge');
+  badge.style.display = 'inline-flex';
+  badge.style.background = zoneColor + '22';
+  badge.style.color = zoneColor;
+  badge.style.border = `1.5px solid ${zoneColor}44`;
+  badge.textContent = `${zoneIcon}  ${zone}`;
+
+  // Stats grid
+  const wellnessColors = { 1:'red',2:'red',3:'red',4:'amber',5:'amber',6:'amber',7:'teal',8:'teal',9:'teal',10:'teal' };
+  document.getElementById('r-stats').innerHTML = `
+    <div class="stat-tile ${barColor === '#DC2626' ? 'red' : barColor === '#D97706' ? 'amber' : 'green'}">
+      <span class="sv">${totalAU.toLocaleString()}</span>
+      <span class="sl">Weekly sRPE load (AU)</span>
+    </div>
+    <div class="stat-tile purple">
+      <span class="sv">${totalHrs.toFixed(1)}h</span>
+      <span class="sl">Total hours this week</span>
+    </div>
+    <div class="stat-tile teal">
+      <span class="sv">${state.sessions.length}</span>
+      <span class="sl">Sessions across all teams</span>
+    </div>
+    <div class="stat-tile ${wellnessColors[state.wellness] || 'teal'}">
+      <span class="sv">${state.wellness}/10</span>
+      <span class="sl">Wellness score</span>
+    </div>
+    <div class="stat-tile amber">
+      <span class="sv">${avgInt}%</span>
+      <span class="sl">Average intensity</span>
+    </div>
+    <div class="stat-tile teal">
+      <span class="sv">${teamsInt}</span>
+      <span class="sl">Teams contributing load</span>
+    </div>
+  `;
+
+  // Personal thresholds
+  const ageHrsStatus  = hrsVsAge  ? `<span style="color:var(--red);font-weight:600;">✗ You exceed this</span>` : `<span style="color:var(--green);font-weight:600;">✓ Within threshold</span>`;
+  const absHrsStatus  = hrsVsAbs  ? `<span style="color:var(--red);font-weight:600;">✗ You exceed this</span>` : `<span style="color:var(--green);font-weight:600;">✓ Within threshold</span>`;
+  document.getElementById('r-threshold-content').innerHTML = `
+    <div class="report-callout ${hrsVsAge ? 'amber' : 'green'}">
+      <strong>Your age-based threshold: ${age} hours per week maximum.</strong><br>
+      Research recommends youth athletes train no more hours per week than their age in years — so at ${age}, your ceiling is ${age} hours. You are at ${totalHrs.toFixed(1)} hours. ${ageHrsStatus}.
+      <br><small style="color:var(--slate);font-size:11px;">Source: Jayanthi et al. (2013) American Academy of Pediatrics; NATA position statement (2025)</small>
+    </div>
+    <div class="report-callout ${hrsVsAbs ? 'red' : 'green'}">
+      <strong>Absolute ceiling: 16 hours per week.</strong><br>
+      Above 16 hours per week, research shows a doubled risk of overuse injury regardless of age. You are at ${totalHrs.toFixed(1)} hours. ${absHrsStatus}.
+      <br><small style="color:var(--slate);font-size:11px;">Source: Brenner & Watson, Pediatrics 2024; Athletics Australia guidelines</small>
+    </div>
+  `;
+
+  // Benchmark table
+  const you = totalAU;
+  const benchmarks = [
+    { group:'Elite youth female basketball (age ~17)', study:'Cruz et al. 2018, PeerJ', low:1800, high:3200, sessions:'5–6 team sessions', note:'Single team only' },
+    { group:'State-level youth basketball (mixed, age ~15)', study:'Palmer et al. 2023, Sports', low:2200, high:4000, sessions:'2–3 state + club', note:'Partial load only' },
+    { group:'High-performance academy male youth', study:'Lever et al. 2024, JSCR', low:2500, high:4200, sessions:'6–10 academy', note:'Australian data' },
+    { group:'Semi-professional female basketball', study:'Plakias et al. 2020, IJERPH', low:2255, high:3500, sessions:'5–8', note:'Single team' },
+    { group:'Professional male basketball (pre-season)', study:'Scanlan et al. 2019, IJSPP', low:3209, high:6907, sessions:'8–12', note:'Adult, pre-season' },
+  ];
+
+  const youRow = `<tr class="highlight"><td><strong>${name} (this week)</strong><span class="you-badge">You</span></td><td>TSCM sRPE</td><td><strong>${you.toLocaleString()}</strong></td><td>${state.sessions.length}</td><td>All teams combined</td></tr>`;
+
+  const benchRows = benchmarks.map(b => {
+    const vsLow  = you < b.low  ? 'below range' : you > b.high ? `${Math.round(((you-b.high)/b.high)*100)}% above` : 'within range';
+    return `<tr><td>${b.group}</td><td style="font-size:11px;color:var(--slate);">${b.study}</td><td>${b.low.toLocaleString()}–${b.high.toLocaleString()}</td><td>${b.sessions}</td><td style="font-size:11px;color:var(--slate);">${b.note}</td></tr>`;
+  }).join('');
+
+  document.getElementById('r-bench-table').innerHTML = `
+    <thead><tr><th>Comparator group</th><th>Source</th><th>Weekly sRPE (AU)</th><th>Sessions/wk</th><th>Notes</th></tr></thead>
+    <tbody>${youRow}${benchRows}</tbody>
+  `;
+
+  // Bench callout
+  const belowAll = you < 2200;
+  const aboveAll = you > 6907;
+  const inRange  = you >= 2200 && you <= 4200;
+  let benchCallout = '';
+  if (belowAll) {
+    benchCallout = `<div class="report-callout green"><strong>${name}'s load sits below all published youth basketball benchmarks.</strong> That's not necessarily a problem — it depends on your goals and where you are in the season. If you're building toward a big event, there may be room to add load progressively.</div>`;
+  } else if (aboveAll) {
+    benchCallout = `<div class="report-callout red"><strong>${name}'s load exceeds all published youth basketball benchmarks, including elite adult pre-season data.</strong> This is the territory where load management is not optional — it's essential. The good news is that a planned reduction now will make you perform significantly better when it counts.</div>`;
+  } else if (inRange) {
+    benchCallout = `<div class="report-callout green"><strong>${name}'s load sits within the published range for high-performance youth basketball.</strong> You're in a sustainable zone. The key is keeping it there — particularly in the weeks leading into your big events.</div>`;
+  } else {
+    benchCallout = `<div class="report-callout amber"><strong>${name}'s load is elevated above the typical youth basketball range.</strong> You're above state and elite youth benchmarks but below professional pre-season. This is manageable, but worth monitoring — especially if you have several weeks of this ahead of a major event.</div>`;
+  }
+  document.getElementById('r-bench-callout').innerHTML = benchCallout;
+
+  document.getElementById('r-sources').innerHTML = `
+    <div class="source-list">Sources: Cruz et al. (2018) PeerJ; Palmer et al. (2023) Sports; Lever & Duffield et al. (2024) JSCR; Lever et al. (2024) J Sports Sci; Plakias et al. (2020) IJERPH; Scanlan et al. (2019) IJSPP. Note: all published benchmarks reflect single-team monitoring only. Multi-team total load has no direct comparator in the literature.</div>
+  `;
+
+  // Multi-team blind spot
+  let multiTeamHtml = '';
+  if (teamsInt >= 2) {
+    multiTeamHtml = `
+      <div class="report-callout">
+        <strong>${name} plays for ${teamsInt} teams. No single one of those coaches can see what you're actually carrying.</strong><br><br>
+        Every study in the table above monitored players from a single team. None of them captured an athlete training and competing across multiple teams simultaneously. Research consistently shows that young athletes aged 12–17 participate in an average of 1.96 sports per year — yet load monitoring almost never reflects this reality.<br><br>
+        What that means for you: the numbers in the comparison table are almost certainly lower than what a real multi-team athlete like you faces in an average week. Your ${totalAU.toLocaleString()} AU is a genuinely novel data point. It's why this kind of total-load tracking matters.
+        <br><small style="color:var(--slate);font-size:11px;">Source: systematic review, Cumulative Load and Injury Risk in Youth Team Sport, PMC 2021</small>
+      </div>
+    `;
+  } else {
+    multiTeamHtml = `
+      <div class="report-callout">
+        <strong>You play for one team right now.</strong> That means the published benchmarks are a reasonable comparison for your situation. If you add more teams or individual sessions during the season, come back and run this again — the picture changes quickly.
+      </div>
+    `;
+  }
+  document.getElementById('r-multiteam-content').innerHTML = multiTeamHtml;
+
+  // Personalised advice
+  let advice = '';
+  if (totalAU < 2200) {
+    advice = `
+      <div class="report-callout green">
+        <strong>Your load is in the lower range.</strong> This is fine — especially if you're earlier in your season or coming off a rest block. If you have a big event coming up, the next few weeks are a good time to build progressively. Focus on consistency rather than sudden spikes — your body adapts best to gradual increases.
+      </div>
+    `;
+  } else if (totalAU <= 4200 && !hrsVsAbs) {
+    advice = `
+      <div class="report-callout green">
+        <strong>You're in a solid training zone.</strong> Your load is within published benchmarks for high-performance youth basketball and your hours are within safe thresholds. The main thing to watch is consistency — a week like this is fine, but if you're doing this every week for months without planned recovery, fatigue accumulates. Keep tracking it.
+      </div>
+    `;
+  } else if (hrsVsAbs && totalAU <= 5500) {
+    advice = `
+      <div class="report-callout amber">
+        <strong>Your hours are above the safety ceiling even though your sRPE load is manageable.</strong> Time spent in organised sport matters independently of intensity. At ${totalHrs.toFixed(1)} hours this week, you're above the 16-hour threshold linked to doubled overuse injury risk. Look at where the hours are stacking — are there sessions you could consolidate or shorten without losing quality?
+      </div>
+    `;
+  } else {
+    const weeksWarning = weeksToGoal !== null && weeksToGoal <= 6
+      ? ` With ${weeksToGoal} weeks to ${state.goal || 'your event'}, this is exactly when you need to be reducing, not holding or increasing.`
+      : '';
+    advice = `
+      <div class="report-callout red">
+        <strong>Your load is high and warrants a plan.</strong>${weeksWarning} The research is clear: athletes who arrive at big competitions fresh outperform athletes who trained through. That means reducing volume — not intensity — in the weeks before your target event. You don't lose fitness. You clear the fatigue so it can show up.<br><br>
+        This is what professional athletes do. It's what the benchmark tool is designed to help you identify. The next step is working out a taper plan with someone who can look at your full schedule.
+      </div>
+    `;
+  }
+
+  // Add wellness note
+  if (state.wellness <= 4) {
+    advice += `<div class="report-callout red" style="margin-top:10px;"><strong>Your wellness score of ${state.wellness}/10 is a significant flag.</strong> Low wellness combined with high load is the classic early warning sign. Your body is telling you something. It's worth listening before it gets louder.</div>`;
+  } else if (state.wellness <= 6 && totalAU > 4000) {
+    advice += `<div class="report-callout amber" style="margin-top:10px;"><strong>Your wellness is moderate at ${state.wellness}/10.</strong> Combined with an elevated load, this is worth monitoring. If this score stays here or drops next week, act on it.</div>`;
+  }
+
+  document.getElementById('r-advice').innerHTML = advice;
+
+  // Goal
+  if (state.goal && weeksToGoal !== null) {
+    let goalAdvice = '';
+    if      (weeksToGoal > 8)  goalAdvice = `You have ${weeksToGoal} weeks. Plenty of runway to build load progressively and still taper properly before the event.`;
+    else if (weeksToGoal > 4)  goalAdvice = `${weeksToGoal} weeks out. Now is when load management starts to matter. Begin a gradual reduction 2–3 weeks before the event.`;
+    else if (weeksToGoal > 2)  goalAdvice = `${weeksToGoal} weeks out. You should be reducing volume now, not adding. Intensity stays, but the total amount comes down.`;
+    else if (weeksToGoal > 0)  goalAdvice = `${weeksToGoal} week${weeksToGoal > 1 ? 's' : ''} out. This is taper territory. Sessions should be shorter, sharper, and fewer. Save the legs for the event.`;
+    else                       goalAdvice = `The event is this week or past. Focus on arrival, sleep, and preparation. Training at full load now won't help.`;
+
+    document.getElementById('r-goal-section').style.display = 'block';
+    document.getElementById('r-goal-content').innerHTML = `
+      <div class="report-callout teal" style="border-color:var(--teal);">
+        <strong>${state.goal}</strong>${state.goalDate ? ` — ${new Date(state.goalDate).toLocaleDateString('en-AU', {day:'numeric',month:'long',year:'numeric'})}` : ''}<br><br>
+        ${goalAdvice}
+      </div>
+    `;
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// SHARE
+// ════════════════════════════════════════════════════════
+function shareReport() {
+  if (navigator.share) {
+    navigator.share({
+      title: `${state.name}'s Training Load Report`,
+      text: `I just used TSCM's Basketball Load Benchmark Tool. My weekly load is ${state.sessions.reduce((s,x)=>s+x.load,0).toLocaleString()} AU — here's how I compare against the science.`,
+      url: window.location.href
+    });
+  } else {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      alert('Link copied to clipboard!');
+    });
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// WHY CARDS — collapsible guide content on hero
+// ════════════════════════════════════════════════════════
+const WHY_CARDS = [
+  {
+    icon: "🏀",
+    title: "You play for multiple teams. Nobody sees the full picture.",
+    body: "Your rep coach sees Tuesday and Thursday. Your school coach sees Wednesday. Your skills coach sees Friday. <strong>None of them know what everyone else is putting you through.</strong> Every week, load stacks up from all sides and nobody is adding it up. That is exactly the problem this tool solves."
+  },
+  {
+    icon: "📊",
+    title: "What is training load, and why does it matter?",
+    body: "Training load is how much total stress your body is under across the whole week. We measure it using sRPE — multiply each session duration by how hard it felt. A 90-minute game at full intensity carries way more load than a 30-minute light shoot. Add it all up and you get a number that tells you something real. <strong>Research across 12+ studies confirms sRPE is a valid, reliable way to track this.</strong>"
+  },
+  {
+    icon: "⚡",
+    title: "More training does not always mean better performance.",
+    body: "There is a sweet spot. Below it you are not building enough. In it you are improving consistently. <strong>Above it for too long your body starts working against you.</strong> Fatigue builds in your muscles and nervous system. Legs go flat. Jump height drops. Reaction time slows. You can feel fine until suddenly you do not. The data shows it before your body tells you."
+  },
+  {
+    icon: "🏆",
+    title: "State trials. National champs. Showing up ready.",
+    body: "The athletes who perform best at the big events are not the ones who trained hardest right up to the day. They are the ones who trained smart and arrived <strong>fresh, explosive, and sharp.</strong> Every professional sport uses a taper before competition — reducing volume while keeping intensity. The fitness you have built does not disappear. The fatigue does. That is the difference."
+  },
+  {
+    icon: "🔬",
+    title: "The science — where your benchmarks come from.",
+    body: "Your report compares you against published research: Cruz et al. (2018) — elite female youth basketball aged 17; Palmer et al. (2023) — Basketball South Australia state program; Lever and Duffield et al. (2024) — Australian high-performance academy. <strong>Every single benchmark study monitored one team at a time.</strong> None captured an athlete playing for 2, 3, or 4 teams simultaneously. That is the gap this tool addresses."
+  },
+];
+
+function initWhyCards() {
+  const container = document.getElementById('why-cards');
+  if (!container) return;
+  container.innerHTML = WHY_CARDS.map((card, i) => `
+    <div class="why-card" id="why-${i}">
+      <div class="why-card-header" onclick="toggleWhyCard(${i})">
+        <span class="why-card-icon">${card.icon}</span>
+        <span class="why-card-title">${card.title}</span>
+        <span class="why-card-chevron">▼</span>
+      </div>
+      <div class="why-card-body">${card.body}</div>
+    </div>
+  `).join('');
+}
+
+function toggleWhyCard(i) {
+  const card = document.getElementById('why-' + i);
+  card.classList.toggle('open');
+}
+
+// init on load
+document.addEventListener('DOMContentLoaded', initWhyCards);
+
+function startOver() {
+  if (!confirm('Start a new benchmark? Your current report will be lost.')) return;
+  state = { name:'', email:'', age:null, gender:'', state:'', level:'', teamsList:[], goal:'', goalDate:'', sessions:[], wellness:null, flags:[], notes:'' };
+  chips = { gender:null, level:null, teams:null };
+  document.getElementById('sessions-list').innerHTML = '';
+  document.getElementById('running-total').style.display = 'none';
+  document.getElementById('btn-next-sessions').style.display = 'none';
+  goTo('hero');
+}
+</script>
+</body>
+</html>
